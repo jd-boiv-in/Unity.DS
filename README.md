@@ -25,7 +25,7 @@ foreach (var element in list) Debug.Log($"Enemy: {element.Name}");
 
 ## Data Structure
 
-- `LinkedList`: Just a simple horizontal line
+- `LinkedList`: Drop-in replacement to the original `LinkedList`
 
 ## TODO
 
