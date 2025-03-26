@@ -35,4 +35,4 @@ foreach (var element in list) Debug.Log($"Enemy: {element.Name}");
 
 ## Credit
 
-- `LinkedList` from [EllanJiang/GameFramework](https://github.com/EllanJiang/GameFramework)
+- `LinkedList` originally from [EllanJiang/GameFramework](https://github.com/EllanJiang/GameFramework)
