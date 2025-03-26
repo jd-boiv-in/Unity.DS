@@ -1,0 +1,17 @@
+{
+  "name": "jd.boiv.in.ds",
+  "version": "1.0.0",
+  "displayName": "Data Structure",
+  "description": "Collection of zero alloc Data Structure for Unity",
+  "dependencies": {
+    
+ },
+ "keywords": [
+    "data-structure", "ds", "zero-alloc"
+  ],
+  "author": {
+    "name": "Jean-Denis Boivin",
+    "email": "jd@boiv.in",
+    "url": "https://jd.boiv.in"
+  }
+}
