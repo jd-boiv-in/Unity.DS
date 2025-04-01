@@ -31,9 +31,6 @@ namespace JD.DS
         public bool IsReadOnly => ((ICollection<T>) _linkedList).IsReadOnly;
         public bool IsSynchronized => ((ICollection) _linkedList).IsSynchronized;
         public object SyncRoot => ((ICollection) _linkedList).SyncRoot;
-
-        private IEnumerator<T> _enumerator;
-        private bool _hasEnumerator;
         
         public LinkedListNode<T> AddAfter(LinkedListNode<T> node, T value)
         {
@@ -164,20 +161,6 @@ namespace JD.DS
             ReleaseNode(last);
         }
 
-        // Not thread-safe and one loop at a time!
-        // But this is what I want and need
-        public IEnumerator<T> GetEnumerator()
-        {
-            if (!_hasEnumerator)
-            {
-                _hasEnumerator = true;
-                _enumerator = new LinkedListEnumerator<T>(this);
-            }
-            
-            _enumerator.Reset();
-            return _enumerator;
-        }
-
         private LinkedListNode<T> AcquireNode(T value)
         {
             LinkedListNode<T> node = null;
@@ -205,6 +188,11 @@ namespace JD.DS
             AddLast(value);
         }
 
+        public Enumerator GetEnumerator()
+        {
+            return new Enumerator(_linkedList);
+        }
+        
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
             return GetEnumerator();
@@ -214,44 +202,39 @@ namespace JD.DS
         {
             return GetEnumerator();
         }
-    }
-    
-    public class LinkedListEnumerator<T> : IEnumerator<T>
-    {
-        private readonly LinkedList<T> _list;
-        private LinkedListNode<T> _current = null;
-
-        public LinkedListEnumerator(LinkedList<T> list)
-        {
-            _list = list;
-        }
         
-        public bool MoveNext()
+        [StructLayout(LayoutKind.Auto)]
+        public struct Enumerator : IEnumerator<T>, IEnumerator
         {
-            if (_current == null)
+            private System.Collections.Generic.LinkedList<T>.Enumerator _enumerator;
+
+            internal Enumerator(System.Collections.Generic.LinkedList<T> linkedList)
             {
-                _current = _list.First;
-                return _current != null;
+#if UNITY_EDITOR
+                if (linkedList == null) throw new Exception("Linked list is invalid.");
+#endif
+                
+                _enumerator = linkedList.GetEnumerator();
+            }
+
+            public T Current => _enumerator.Current;
+
+            object IEnumerator.Current => _enumerator.Current;
+
+            public void Dispose()
+            {
+                _enumerator.Dispose();
             }
             
-            _current = _current.Next;
-            return _current != null;
-        }
-
-        public void Reset()
-        {
-            _current = null;
-        }
-
-        public T Current => _current == null ? default : _current.Value;
-
-        // Boxing seems scary, but it isn't actually called so this is fine
-        // Kind of weird from C# to force implement this?
-        object IEnumerator.Current => Current;
-
-        public void Dispose()
-        {
-            // Nothing
+            public bool MoveNext()
+            {
+                return _enumerator.MoveNext();
+            }
+            
+            void IEnumerator.Reset()
+            {
+                ((IEnumerator<T>) _enumerator).Reset();
+            }
         }
     }
 }
