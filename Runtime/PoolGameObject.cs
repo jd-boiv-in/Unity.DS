@@ -21,6 +21,7 @@ namespace JD.DS
             _pool = new Queue<T>(Capacity);
             if (Fill) for (var i = 0; i < Capacity; i++)
                 _pool.Enqueue(Create());
+            Release(Prefab);
         }
 
         public T Get()
@@ -34,19 +35,27 @@ namespace JD.DS
         
         public T Create()
         {
-            return Instantiate(Prefab, transform);
+            var obj = Instantiate(Prefab, transform);
+            Hide(obj);
+            return obj;
         }
-        
-        public void Release(T component)
+
+        private void Hide(T component)
         {
+            //return;
+            
             // Moving very far is less costly than disabling
             // Obviously, we need to not use `Update()`, etc.
             // TODO: Profile again to makes sure
             var obj = component.gameObject;
-            obj.transform.localPosition = new Vector3(-90000, -90000, -90000);
+            obj.transform.position = new Vector3(-999999999, 0, 0);
             
             //obj.SetActive(false);
-            
+        }
+        
+        public void Release(T component)
+        {
+            Hide(component);
             _pool.Enqueue(component);
             List.Remove(component);
         }
