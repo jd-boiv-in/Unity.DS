@@ -24,6 +24,16 @@ namespace JD.DS
             Release(Prefab);
         }
 
+        public void Clear()
+        {
+            foreach (var obj in List)
+            {
+                Hide(obj);
+                _pool.Enqueue(obj);
+            }
+            List.Clear();
+        }
+        
         public T Get()
         {
             if (!_pool.TryDequeue(out var result))
